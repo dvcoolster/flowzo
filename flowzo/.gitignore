@@ -1,0 +1,14 @@
+# Node
+node_modules/
+dist/
+# Python
+__pycache__/
+*.pyc
+# macOS
+.DS_Store
+# Docker/Terraform
+infra/.terraform/
+# Logs
+logs/
+# Env files
+.env* 
