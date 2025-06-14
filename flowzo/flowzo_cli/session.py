@@ -4,6 +4,7 @@
 import asyncio
 import json
 import time
+from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, Optional
 
@@ -30,13 +31,14 @@ class SessionEvent(BaseModel):
 class SessionEngine:
     """Finite State Machine for managing focus sessions."""
     
-    def __init__(self, session_id: Optional[str] = None) -> None:
+    def __init__(self, session_id: Optional[str] = None, ledger=None) -> None:
         """Initialize session engine."""
         self.session_id = session_id or f"session_{int(time.time())}"
         self.state = SessionState.IDLE
         self.start_time: Optional[float] = None
         self.duration: int = 0
         self.events: list[SessionEvent] = []
+        self.ledger = ledger  # Optional FlowLedger instance
     
     def _emit_event(self, event_type: str, data: Optional[Dict[str, Any]] = None) -> SessionEvent:
         """Emit a session event."""
@@ -48,6 +50,17 @@ class SessionEngine:
             data=data or {},
         )
         self.events.append(event)
+        
+        # Log to ledger if available
+        if self.ledger:
+            self.ledger.log_session_event(
+                session_id=self.session_id,
+                timestamp=event.timestamp,
+                event_type=event_type,
+                state=self.state,
+                data=data or {},
+            )
+        
         return event
     
     def transition_to(self, new_state: SessionState) -> SessionEvent:
@@ -66,6 +79,15 @@ class SessionEngine:
         
         self.duration = duration
         self.start_time = time.time()
+        
+        # Create session record in ledger
+        if self.ledger:
+            self.ledger.create_session_record(
+                session_id=self.session_id,
+                start_time=datetime.fromtimestamp(self.start_time),
+                duration_seconds=duration,
+                state="priming",
+            )
         
         # Priming phase
         self.transition_to(SessionState.PRIMING)
@@ -88,6 +110,14 @@ class SessionEngine:
         # Back to idle
         self.transition_to(SessionState.IDLE)
         self._emit_event("session_completed", {"total_duration": time.time() - self.start_time})
+        
+        # Update session record in ledger
+        if self.ledger:
+            self.ledger.update_session_record(
+                session_id=self.session_id,
+                end_time=datetime.fromtimestamp(time.time()),
+                state="completed",
+            )
     
     def abort_session(self) -> SessionEvent:
         """Abort the current session."""

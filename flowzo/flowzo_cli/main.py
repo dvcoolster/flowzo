@@ -11,6 +11,7 @@ from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn, TimeElapsedColumn
 
 from .session import SessionEngine
+from flowzo_ledger.database import FlowLedger
 
 app = typer.Typer(
     name="flowzo",
@@ -24,9 +25,12 @@ console = Console()
 def start(
     duration: Annotated[int, typer.Option("--duration", "-d", help="Session duration in seconds")] = 5,
     json_output: Annotated[bool, typer.Option("--json", help="Output events as JSON")] = False,
+    no_ledger: Annotated[bool, typer.Option("--no-ledger", help="Skip ledger storage")] = False,
 ) -> None:
     """Start a focus session using SessionEngine FSM."""
-    engine = SessionEngine()
+    # Initialize ledger unless disabled
+    ledger = None if no_ledger else FlowLedger()
+    engine = SessionEngine(ledger=ledger)
     
     if json_output:
         # Run session and output JSON events
