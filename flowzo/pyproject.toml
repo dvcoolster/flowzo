@@ -1,0 +1,65 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "flowzo"
+version = "0.1.0"
+description = "Programmable flow state companion"
+readme = "README.md"
+license = "AGPL-3.0-only"
+authors = [
+    {name = "FlowZo Contributors", email = "hello@flowzo.dev"},
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU Affero General Public License v3",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+]
+requires-python = ">=3.12"
+dependencies = [
+    "typer[all]>=0.9.0",
+    "fastapi>=0.104.0",
+    "uvicorn[standard]>=0.24.0",
+    "sqlmodel>=0.0.14",
+    "ariadne>=0.22.0",
+    "httpx>=0.25.0",
+    "keyring>=24.3.0",
+    "rich>=13.7.0",
+    "pydantic>=2.5.0",
+    "asyncio-mqtt>=0.16.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.1.0",
+    "ruff>=0.1.6",
+    "mypy>=1.7.0",
+    "black>=23.11.0",
+]
+
+[project.scripts]
+flowzo = "flowzo_cli.main:app"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 88
+select = ["E", "F", "W", "C", "I", "N", "D", "UP", "ANN", "S", "BLE", "FBT", "B", "A", "COM", "C4", "DTZ", "T10", "EM", "EXE", "FA", "ISC", "ICN", "G", "INP", "PIE", "T20", "PYI", "PT", "Q", "RSE", "RET", "SLF", "SLOT", "SIM", "TID", "TCH", "INT", "ARG", "PTH", "TD", "FIX", "ERA", "PD", "PGH", "PL", "TRY", "FLY", "NPY", "AIR", "PERF", "FURB", "LOG", "RUF"]
+ignore = ["D100", "D101", "D102", "D103", "D104", "D105", "D106", "D107", "ANN101", "ANN102"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "--cov=flowzo_cli --cov=flowzo_ledger --cov-report=term-missing --cov-report=xml" 
