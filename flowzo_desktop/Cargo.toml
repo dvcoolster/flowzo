@@ -1,0 +1,21 @@
+[package]
+name = "flowzo_desktop"
+version = "0.1.0"
+description = "FlowZo Desktop Overlay"
+authors = ["FlowZo Contributors <hello@flowzo.dev>"]
+license = "AGPL-3.0-only"
+repository = "https://github.com/dvcoolster/flowzo"
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "1.5", features = [] }
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+tauri = { workspace = true }
+tokio = { workspace = true }
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"] 
