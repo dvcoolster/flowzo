@@ -12,6 +12,8 @@ from rich.progress import Progress, SpinnerColumn, TextColumn, TimeElapsedColumn
 
 from .session import SessionEngine
 from flowzo_ledger.database import FlowLedger
+from flowzo_integrations.github import GitHubIntegration
+from flowzo_integrations.linear import LinearIntegration
 
 app = typer.Typer(
     name="flowzo",
@@ -19,6 +21,10 @@ app = typer.Typer(
     add_completion=False,
 )
 console = Console()
+
+# Auth subcommand
+auth_app = typer.Typer(name="auth", help="Manage integration authentication")
+app.add_typer(auth_app)
 
 
 @app.command()
@@ -78,10 +84,100 @@ async def _run_session_ui(engine: SessionEngine, duration: int) -> None:
 
 
 @app.command()
-def next() -> None:
+def next(
+    source: Annotated[str, typer.Option("--source", "-s", help="Integration source (github/linear)")] = "github",
+) -> None:
     """Show next task from integrations."""
-    console.print("[yellow]Integration not yet implemented[/yellow]")
-    console.print("Next: Implement GitHub/Linear integration")
+    asyncio.run(_get_next_task(source))
+
+
+async def _get_next_task(source: str) -> None:
+    """Get next task from specified integration."""
+    try:
+        if source == "github":
+            github = GitHubIntegration()
+            issue = await github.get_next_issue()
+            if issue:
+                console.print(f"[bold green]Next GitHub Issue:[/bold green]")
+                console.print(f"[bold]{issue.repository}#{issue.number}[/bold]: {issue.title}")
+                console.print(f"URL: {issue.html_url}")
+                if issue.labels:
+                    console.print(f"Labels: {', '.join(issue.labels)}")
+            else:
+                console.print("[yellow]No assigned GitHub issues found[/yellow]")
+        
+        elif source == "linear":
+            linear = LinearIntegration()
+            issue = await linear.get_next_issue()
+            if issue:
+                console.print(f"[bold green]Next Linear Issue:[/bold green]")
+                console.print(f"[bold]{issue.identifier}[/bold]: {issue.title}")
+                console.print(f"Team: {issue.team} | State: {issue.state}")
+                console.print(f"URL: {issue.url}")
+                if issue.labels:
+                    console.print(f"Labels: {', '.join(issue.labels)}")
+            else:
+                console.print("[yellow]No assigned Linear issues found[/yellow]")
+        
+        else:
+            console.print(f"[red]Unknown source: {source}[/red]")
+            console.print("Available sources: github, linear")
+    
+    except ValueError as e:
+        console.print(f"[red]Error: {e}[/red]")
+    except Exception as e:
+        console.print(f"[red]Integration error: {e}[/red]")
+
+
+@auth_app.command("github")
+def auth_github(
+    token: Annotated[str, typer.Option("--token", "-t", help="GitHub personal access token")],
+    username: Annotated[str, typer.Option("--username", "-u", help="GitHub username")],
+) -> None:
+    """Store GitHub authentication token."""
+    github = GitHubIntegration()
+    github.store_token(token, username)
+    console.print(f"[green]GitHub token stored for user: {username}[/green]")
+
+
+@auth_app.command("linear")
+def auth_linear(
+    api_key: Annotated[str, typer.Option("--api-key", "-k", help="Linear API key")],
+) -> None:
+    """Store Linear authentication API key."""
+    linear = LinearIntegration()
+    linear.store_api_key(api_key)
+    console.print("[green]Linear API key stored[/green]")
+
+
+@auth_app.command("test")
+def auth_test(
+    source: Annotated[str, typer.Option("--source", "-s", help="Integration to test (github/linear)")] = "github",
+) -> None:
+    """Test integration authentication."""
+    asyncio.run(_test_auth(source))
+
+
+async def _test_auth(source: str) -> None:
+    """Test authentication for specified integration."""
+    try:
+        if source == "github":
+            github = GitHubIntegration()
+            user_info = await github.test_connection()
+            console.print(f"[green]GitHub connection successful![/green]")
+            console.print(f"User: {user_info['login']} ({user_info['name']})")
+        
+        elif source == "linear":
+            linear = LinearIntegration()
+            user_info = await linear.test_connection()
+            console.print(f"[green]Linear connection successful![/green]")
+            console.print(f"User: {user_info['viewer']['name']} ({user_info['viewer']['email']})")
+        
+        else:
+            console.print(f"[red]Unknown source: {source}[/red]")
+    
+    except Exception as e:
+        console.print(f"[red]Authentication test failed: {e}[/red]")
 
 
 if __name__ == "__main__":
