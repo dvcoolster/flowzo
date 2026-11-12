@@ -4,7 +4,7 @@
 import asyncio
 import json
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
@@ -84,7 +84,7 @@ class SessionEngine:
         if self.ledger:
             self.ledger.create_session_record(
                 session_id=self.session_id,
-                start_time=datetime.fromtimestamp(self.start_time),
+                start_time=datetime.fromtimestamp(self.start_time, tz=timezone.utc),
                 duration_seconds=duration,
                 state="priming",
             )
@@ -115,7 +115,7 @@ class SessionEngine:
         if self.ledger:
             self.ledger.update_session_record(
                 session_id=self.session_id,
-                end_time=datetime.fromtimestamp(time.time()),
+                end_time=datetime.fromtimestamp(time.time(), tz=timezone.utc),
                 state="completed",
             )
     

@@ -36,4 +36,4 @@ def test_cli_next_exits_zero() -> None:
     )
     
     assert result.returncode == 0
-    assert "Integration not yet implemented" in result.stdout 
+    assert "No GitHub token available" in result.stdout 
