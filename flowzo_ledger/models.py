@@ -1,10 +1,14 @@
 # SPDX-License-Identifier: AGPL-3.0-only
 """SQLModel models for FlowZo ledger storage."""
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 
 from sqlmodel import Field, SQLModel
+
+
+def utc_now() -> datetime:
+    return datetime.now(timezone.utc)
 
 
 class SessionRecord(SQLModel, table=True):
@@ -18,8 +22,8 @@ class SessionRecord(SQLModel, table=True):
     end_time: Optional[datetime] = None
     duration_seconds: int
     state: str
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=utc_now)
+    updated_at: datetime = Field(default_factory=utc_now)
 
 
 class SessionEvent(SQLModel, table=True):
@@ -33,7 +37,7 @@ class SessionEvent(SQLModel, table=True):
     event_type: str
     state: str
     data: str  # JSON string
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=utc_now)
 
 
 class FlowContext(SQLModel, table=True):
@@ -46,4 +50,4 @@ class FlowContext(SQLModel, table=True):
     context_type: str  # "keystroke", "ide_state", "window_focus", etc.
     timestamp: float
     data: str  # JSON string
-    created_at: datetime = Field(default_factory=datetime.utcnow) 
+    created_at: datetime = Field(default_factory=utc_now) 

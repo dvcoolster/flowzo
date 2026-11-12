@@ -9,7 +9,7 @@ from typing import List, Optional
 
 from sqlmodel import Session, SQLModel, create_engine, select
 
-from .models import FlowContext, SessionEvent, SessionRecord
+from .models import FlowContext, SessionEvent, SessionRecord, utc_now
 
 
 class FlowLedger:
@@ -67,7 +67,7 @@ class FlowLedger:
                     record.end_time = end_time
                 if state:
                     record.state = state
-                record.updated_at = datetime.utcnow()
+                record.updated_at = utc_now()
                 
                 session.add(record)
                 session.commit()

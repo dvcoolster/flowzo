@@ -3,7 +3,7 @@
 
 import asyncio
 import tempfile
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pytest
@@ -25,7 +25,7 @@ def temp_ledger():
 def test_ledger_session_record_creation(temp_ledger):
     """Test creating and retrieving session records."""
     session_id = "test_session_123"
-    start_time = datetime.utcnow()
+    start_time = datetime.now(timezone.utc)
     
     # Create session record
     record = temp_ledger.create_session_record(
@@ -36,7 +36,10 @@ def test_ledger_session_record_creation(temp_ledger):
     )
     
     assert record.session_id == session_id
-    assert record.start_time == start_time
+    stored = record.start_time
+    if stored.tzinfo is None:
+        stored = stored.replace(tzinfo=timezone.utc)
+    assert stored == start_time
     assert record.duration_seconds == 1500
     assert record.state == "active"
     
@@ -121,7 +124,7 @@ def test_ledger_recent_sessions(temp_ledger):
     for i in range(5):
         temp_ledger.create_session_record(
             session_id=f"session_{i}",
-            start_time=datetime.utcnow(),
+            start_time=datetime.now(timezone.utc),
             duration_seconds=1500,
         )
     

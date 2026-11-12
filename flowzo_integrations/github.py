@@ -84,6 +84,8 @@ class GitHubIntegration:
     
     async def get_assigned_issues(self, state: str = "open", limit: int = 10) -> List[GitHubIssue]:
         """Get issues assigned to the authenticated user."""
+        if not self.get_token():
+            raise ValueError("No GitHub token available. Run 'flowzo auth github' first.")
         if not self.username:
             raise ValueError("Username not set")
         

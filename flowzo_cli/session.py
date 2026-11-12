@@ -4,9 +4,9 @@
 import asyncio
 import json
 import time
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel
 
@@ -37,7 +37,7 @@ class SessionEngine:
         self.state = SessionState.IDLE
         self.start_time: Optional[float] = None
         self.duration: int = 0
-        self.events: list[SessionEvent] = []
+        self.events: List[SessionEvent] = []
         self.ledger = ledger  # Optional FlowLedger instance
     
     def _emit_event(self, event_type: str, data: Optional[Dict[str, Any]] = None) -> SessionEvent:
@@ -84,7 +84,7 @@ class SessionEngine:
         if self.ledger:
             self.ledger.create_session_record(
                 session_id=self.session_id,
-                start_time=datetime.fromtimestamp(self.start_time),
+                start_time=datetime.fromtimestamp(self.start_time, tz=timezone.utc),
                 duration_seconds=duration,
                 state="priming",
             )
@@ -115,7 +115,7 @@ class SessionEngine:
         if self.ledger:
             self.ledger.update_session_record(
                 session_id=self.session_id,
-                end_time=datetime.fromtimestamp(time.time()),
+                end_time=datetime.fromtimestamp(time.time(), tz=timezone.utc),
                 state="completed",
             )
     
