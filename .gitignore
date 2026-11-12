@@ -1,14 +1,36 @@
-# Node
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# Node / SvelteKit
 node_modules/
 dist/
-# Python
-__pycache__/
-*.pyc
+.svelte-kit/
+
+# Rust / Tauri
+target/
+
 # macOS
 .DS_Store
+
 # Docker/Terraform
 infra/.terraform/
+
 # Logs
 logs/
+*.log
+
 # Env files
-.env* 
+.env*

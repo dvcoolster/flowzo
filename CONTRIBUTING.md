@@ -1,12 +1,22 @@
-# Contributing to Flowzo
+# Contributing to FlowZo
 
 ## Quick start
 
+Requires **Python 3.9+**.
+
 ```bash
-pnpm install
-docker compose up -d # Postgres, Redis, Synapse, mautrix-whatsapp
-pnpm dev:web         # hot-reload PWA
+python3 -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+pip install -e ".[dev]"
 ```
+
+```bash
+pytest
+ruff check .
+mypy .
+```
+
+Desktop overlay: see `flowzo_desktop/` (Node + Rust/Tauri). That is optional for Python CLI work.
 
 ## Conventional commits
 
@@ -14,6 +24,5 @@ Use `feat:`, `fix:`, `docs:`, `chore:` prefixes in commit messages.
 
 ## Pull-request checklist
 
-- [ ] `pnpm test` & `pnpm lint` pass
+- [ ] `pytest`, `ruff check .`, and `mypy .` pass
 - [ ] Docs updated if behaviour/API changed
-- [ ] At least one Bridge Champion reviewer requested 

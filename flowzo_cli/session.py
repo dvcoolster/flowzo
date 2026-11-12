@@ -6,7 +6,7 @@ import json
 import time
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel
 
@@ -37,7 +37,7 @@ class SessionEngine:
         self.state = SessionState.IDLE
         self.start_time: Optional[float] = None
         self.duration: int = 0
-        self.events: list[SessionEvent] = []
+        self.events: List[SessionEvent] = []
         self.ledger = ledger  # Optional FlowLedger instance
     
     def _emit_event(self, event_type: str, data: Optional[Dict[str, Any]] = None) -> SessionEvent:

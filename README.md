@@ -4,7 +4,7 @@
 
 [![CI](https://github.com/dvcoolster/flowzo/workflows/CI/badge.svg)](https://github.com/dvcoolster/flowzo/actions)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
-[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 
 FlowZo is a **programmable "flow state" companion** that helps you maintain deep focus and intentional work sessions.
 
@@ -18,7 +18,12 @@ FlowZo is a **programmable "flow state" companion** that helps you maintain deep
 
 ## Quick Start
 
+Requires **Python 3.9+**.
+
 ```bash
+python3 -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+
 # Install FlowZo
 pip install -e .
 
@@ -43,7 +48,12 @@ See [docs/architecture.md](docs/architecture.md) for detailed technical design.
 
 ## Development
 
+Requires **Python 3.9+**. Hatchling ships `flowzo_cli`, `flowzo_ledger`, and `flowzo_integrations` (the distribution name is `flowzo`).
+
 ```bash
+python3 -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+
 # Install development dependencies
 pip install -e ".[dev]"
 
@@ -57,6 +67,8 @@ mypy .
 # Format code
 black .
 ```
+
+If install fails with `Unable to determine which files to ship inside the wheel`, you need a checkout that includes `[tool.hatch.build.targets.wheel]` in `pyproject.toml`.
 
 ## Contributing
 
